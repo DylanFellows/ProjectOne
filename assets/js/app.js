@@ -50,7 +50,7 @@ function showError(error) {
 function initialize() {
 
     var mapOptions = {
-        zoom: 14,
+        zoom: 6,
         //center: new google.maps.LatLng(50, -50)
     };
 
