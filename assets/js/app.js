@@ -99,20 +99,16 @@ var getCoords = function () {
     var NE = bounds.getNorthEast();
     var SW = bounds.getSouthWest();
     getWeather(NE.lat(), NE.lng(), SW.lat(), SW.lng());
-};
-
-// Make the weather request
-var getWeather = function (northLat, eastLng, southLat, westLng) {
+  };
+  // Make the weather request
+  var getWeather = function(northLat, eastLng, southLat, westLng) {
     gettingData = true;
     var requestString = "http://api.openweathermap.org/data/2.5/box/city?bbox="
-
-        + westLng + "," + northLat + "," //left top
-        + eastLng + "," + southLat + "," //right bottom
-        + map.getZoom()
-        + "&units=imperial"
-        + "&cluster=yes&format=json"
-        + "&APPID=" + openWeatherMapKey
-        ;
+                        + westLng + "," + northLat + "," //left top
+                        + eastLng + "," + southLat + "," //right bottom
+                        + map.getZoom() + "&units=imperial"
+                        + "&cluster=yes&format=json"
+                        + "&APPID=" + openWeatherMapKey;
     request = new XMLHttpRequest();
     request.onload = proccessResults;
     request.open("get", requestString, true);
@@ -127,142 +123,84 @@ var proccessResults = function () {
     if (results.list.length > 0) {
         resetData();
         for (var i = 0; i < results.list.length; i++) {
-            geoJSON.features.push(jsonToGeoJson(results.list[i]));
+          geoJSON.features.push(jsonToGeoJson(results.list[i]));
         }
         drawIcons(geoJSON);
     }
-};
-
-var infowindow = new google.maps.InfoWindow();
-// For each result that comes back, convert the data to geoJSON
-var jsonToGeoJson = function (weatherItem) {
+  };
+  var infowindow = new google.maps.InfoWindow();
+  // For each result that comes back, convert the data to geoJSON
+  var jsonToGeoJson = function (weatherItem) {
     var feature = {
-        type: "Feature",
-        properties: {
-            city: weatherItem.name,
-            weather: weatherItem.weather[0].main,
-            temperature: weatherItem.main.temp,
-            min: weatherItem.main.temp_min,
-            max: weatherItem.main.temp_max,
-            humidity: weatherItem.main.humidity,
-            pressure: weatherItem.main.pressure,
-            windSpeed: weatherItem.wind.speed,
-            windDegrees: weatherItem.wind.deg,
-            windGust: weatherItem.wind.gust,
-            icon: "http://openweathermap.org/img/w/"
-                + weatherItem.weather[0].icon + ".png",
-            coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
-        },
-        geometry: {
-            type: "Point",
-            coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
-        }
-
+      type: "Feature",
+      properties: {
+        city: weatherItem.name,
+        weather: weatherItem.weather[0].main,
+        temperature: weatherItem.main.temp,
+        min: weatherItem.main.temp_min,
+        max: weatherItem.main.temp_max,
+        humidity: weatherItem.main.humidity,
+        pressure: weatherItem.main.pressure,
+        windSpeed: weatherItem.wind.speed,
+        windDegrees: weatherItem.wind.deg,
+        windGust: weatherItem.wind.gust,
+        icon: "http://openweathermap.org/img/w/"
+              + weatherItem.weather[0].icon  + ".png",
+        coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
+      }
     };
     // Set the custom marker icon
-    map.data.setStyle(function (feature) {
-        return {
-            icon: {
-                url: feature.getProperty('icon'),
-                anchor: new google.maps.Point(25, 25)
-            }
-        };
+    map.data.setStyle(function(feature) {
+      return {
+        icon: {
+          url: feature.getProperty('icon'),
+          anchor: new google.maps.Point(25, 25)
+        }
+      };
     });
     // returns object
     return feature;
-};
-
-// Add the markers to the map
-var drawIcons = function (weather) {
-    map.data.addGeoJson(geoJSON);
-    // Set the flag to finished
-    gettingData = false;
-};
-
-// Clear data layer and geoJSON
-var resetData = function () {
+  };
+  // Add the markers to the map
+  var drawIcons = function (weather) {
+     map.data.addGeoJson(geoJSON);
+     // Set the flag to finished
+     gettingData = false;
+  };
+  // Clear data layer and geoJSON
+  var resetData = function () {
     geoJSON = {
-        type: "FeatureCollection",
-        features: []
+      type: "FeatureCollection",
+      features: []
     };
-    map.data.forEach(function (feature) {
-        map.data.remove(feature);
+    map.data.forEach(function(feature) {
+      map.data.remove(feature);
     });
-};
-
-google.maps.event.addDomListener(window, 'load', initialize);
-
-
-/*var x = document.getElementById("demo");
-
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
-        x.innerHTML = "Geolocation is not supported by this browser.";
-    }
-};
-
-function showPosition(position) {
-    x.innerHTML = "Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude;
-};*/
+  };
+  google.maps.event.addDomListener(window, 'load', initialize);
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/*const geolocateURL = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk";
-
-$.ajax({
-    url: geolocateURL,
-    method: 'GET',
-    data: 
-    {
-        "homeMobileCountryCode": 310,
-        "homeMobileNetworkCode": 410,
-        "radioType": "gsm",
-        "carrier": "Vodafone",
-        "considerIp": "true",
-        "cellTowers": [
-          // See the Cell Tower Objects section below.
-          {
-            "cellId": 42,
-            "locationAreaCode": 415,
-            "mobileCountryCode": 310,
-            "mobileNetworkCode": 410,
-            "age": 0,
-            "signalStrength": -60,
-            "timingAdvance": 15
-          }
-        ],
-        "wifiAccessPoints": [
-          // See the WiFi Access Point Objects section below.
-          {
-            "macAddress": "00:25:9c:cf:1c:ac",
-            "signalStrength": -43,
-            "age": 0,
-            "channel": 11,
-            "signalToNoiseRatio": 0
-          }
-        ]
-      }
-}).then(function (response) {
-
-console.log(response);
-
+$('#btnSubmit').on('click', function(event){
+  event.preventDefault();
+  var cityCountry = $('#srcinpt').val();
+  console.log(cityCountry);
+  $.ajax({
+    url: `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`,
+    method: 'GET'
+  }).then(function(response){
+    console.log(response);
+    moveToLocation(response.city.coord.lat, response.city.coord.lon);
+    $('#srcinpt').val('');
+  });
 });
-//return position;*/
 
-
+function moveToLocation(lat, lng){
+  var center = new google.maps.LatLng(lat, lng);
+  map.panTo(center);
+};
