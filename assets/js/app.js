@@ -1,49 +1,100 @@
 var map;
-  var geoJSON;
-  var request;
-  var gettingData = false;
-  var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696"
- 
-  function initialize() {
+var geoJSON;
+var request;
+var gettingData = false;
+var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696";
+
+var x = document.getElementById("demo");
+
+function getLocation() {
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+
+};
+
+getLocation();
+
+function showPosition(position) {
+
+    x.innerHTML = "Latitude: " + position.coords.latitude +
+        "<br>Longitude: " + position.coords.longitude;
+    var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    map.setCenter(relocate);
+
+};
+
+function showError(error) {
+
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            x.innerHTML = "User denied the request for Geolocation."
+            break;
+        case error.POSITION_UNAVAILABLE:
+            x.innerHTML = "Location information is unavailable."
+            break;
+        case error.TIMEOUT:
+            x.innerHTML = "The request to get user location timed out."
+            break;
+        case error.UNKNOWN_ERROR:
+            x.innerHTML = "An unknown error occurred."
+            break;
+
+    }
+
+};
+
+function initialize() {
+
     var mapOptions = {
-      zoom: 6,
-      center: new google.maps.LatLng(50,-50)
+        zoom: 6,
+        //center: new google.maps.LatLng(50, -50)
     };
+
+
     map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
+
+
+
     // Add interaction listeners to make weather requests
     google.maps.event.addListener(map, 'idle', checkIfDataRequested);
     // Sets up and populates the info window with details
-    map.data.addListener('click', function(event) {
-      infowindow.setContent(
-       "<img src=" + event.feature.getProperty("icon") + ">"
-       + "<br /><strong>" + event.feature.getProperty("city") + "</strong>"
-       + "<br />" + event.feature.getProperty("temperature") + "&deg;F"
-       + "<br />" + event.feature.getProperty("weather")
-       );
-      infowindow.setOptions({
-          position:{
-            lat: event.latLng.lat(),
-            lng: event.latLng.lng()
-          },
-          pixelOffset: {
-            width: 0,
-            height: -15
-          }
+    map.data.addListener('click', function (event) {
+        infowindow.setContent(
+            "<img src=" + event.feature.getProperty("icon") + ">"
+            + "<br /><strong>" + event.feature.getProperty("city") + "</strong>"
+            + "<br />" + event.feature.getProperty("temperature") + "&deg;F"
+            + "<br />" + event.feature.getProperty("weather")
+        );
+        infowindow.setOptions({
+            position: {
+                lat: event.latLng.lat(),
+                lng: event.latLng.lng()
+            },
+            pixelOffset: {
+                width: 0,
+                height: -15
+            }
         });
-      infowindow.open(map);
+        infowindow.open(map);
     });
-  }
-  var checkIfDataRequested = function() {
+};
+
+var checkIfDataRequested = function () {
     // Stop extra requests being sent
     while (gettingData === true) {
-      request.abort();
-      gettingData = false;
+        request.abort();
+        gettingData = false;
     }
     getCoords();
-  };
-  // Get the coordinates from the Map bounds
-  var getCoords = function() {
+};
+
+// Get the coordinates from the Map bounds
+var getCoords = function () {
     var bounds = map.getBounds();
     var NE = bounds.getNorthEast();
     var SW = bounds.getSouthWest();
@@ -62,9 +113,11 @@ var map;
     request.onload = proccessResults;
     request.open("get", requestString, true);
     request.send();
-  };
-  // Take the JSON results and proccess them
-  var proccessResults = function() {
+    console.log(requestString);
+};
+
+// Take the JSON results and proccess them
+var proccessResults = function () {
     console.log(this);
     var results = JSON.parse(this.responseText);
     if (results.list.length > 0) {
@@ -150,4 +203,4 @@ $('#btnSubmit').on('click', function(event){
 function moveToLocation(lat, lng){
   var center = new google.maps.LatLng(lat, lng);
   map.panTo(center);
-}
+};
