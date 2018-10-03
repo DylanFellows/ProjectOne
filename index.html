@@ -5,45 +5,56 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+
     <link rel="stylesheet" href="./assets/bootstrap/css/bootstrap.min.css">
-    <title>Hello, world!</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+
+    <title>Welcome</title>
 </head>
 
-<body>
-    <div class="container-fluid">
-        <div class="pos-f-t">
-            <div class="collapse" id="navbarToggleExternalContent">
-                <div class="bg-dark p-4">
-                    <h4 class="text-white">
-                        <button type="button" class="btn btn-success">Destination</button>
-                        <button type="button" class="btn btn-warning">Warning</button>
-                        <button type="button" class="btn btn-danger">Danger</button>
-                        <button type="button" class="btn btn-maps">Maps</button>
-                        <button type="button" class="btn btn-weather">Weather</button>
-                    </h4>
-                    <span class="text-muted">Home/Menu</span>
-                </div>
+
+
+<body class="container-fluid">
+
+        
+
+
+
+    <div class="container-fluid pos-f-t">
+        <div class="collapse" id="navbarToggleExternalContent">
+            <div class=" p-4">
+                    <button type="button" class="btn btn-outline-warning">warning</button>
+                    <button type="button" class="btn btn-outline-weather">weather</button>
+                    <button type="button" class="btn btn-outline-navigation">navigation</button>
+                    <button type="button" class="btn btn-outline-State">state</button>
+                    <button type="button" class="btn btn-outline-city">city</button>
+
             </div>
-            <nav class="navbar navbar-dark bg-dark">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent"
-                    aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </nav>
         </div>
-   
+        <nav class="navbar">
+            <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent"
+                aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">MENU
+            </button>
+
+            <form class="form-inline inputbr">
+                    <input id="srcinpt" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
+                  </form>
+        </nav>
     </div>
-    <div class="container">
-        <div class="row"></div>
-    <form class="inptbr">
-            <div class="form-group inpt">
-                <label for="formGroupExampleInput">Search</label>
-                <input id="Search" type="text" class="form-control" placeholder="Search Keywords">
-            </div>
-        </form>
-    </div>
+
+
+
+
+    <div id="map-canvas"></div>
+
+
+
+
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
+    <script src="assets/js/popper.js"></script>
     <script src="./assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 
