@@ -1,5 +1,3 @@
-
-
 .inputbr {
     position: relative;
     left: 5%;
@@ -15,6 +13,7 @@ html, body{
     height: 100%;
     margin: 0;
     padding: 0;
+    background-color: black;
   }
   #map-canvas {
     width: 100%;
@@ -23,3 +22,15 @@ html, body{
   .gm-style-iw {
     text-align: center;
   }
+
+  #map-canvas {
+      margin-top: 0%;
+      border-style: groove;
+      border-width: 10px;
+      border-color: whitesmoke;
+  }
+
+  .topnav {
+      
+  }
+
