@@ -4,15 +4,62 @@ var request;
 var gettingData = false;
 var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696";
 
+var x = document.getElementById("demo");
+
+function getLocation() {
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+
+};
+
+getLocation();
+
+function showPosition(position) {
+
+    x.innerHTML = "Latitude: " + position.coords.latitude +
+        "<br>Longitude: " + position.coords.longitude;
+    var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    map.setCenter(relocate);
+
+};
+
+function showError(error) {
+
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            x.innerHTML = "User denied the request for Geolocation."
+            break;
+        case error.POSITION_UNAVAILABLE:
+            x.innerHTML = "Location information is unavailable."
+            break;
+        case error.TIMEOUT:
+            x.innerHTML = "The request to get user location timed out."
+            break;
+        case error.UNKNOWN_ERROR:
+            x.innerHTML = "An unknown error occurred."
+            break;
+
+    }
+
+};
+
 function initialize() {
 
     var mapOptions = {
-        zoom: 4,
-        center: new google.maps.LatLng(50, -50)
+        zoom: 14,
+        //center: new google.maps.LatLng(50, -50)
     };
+
 
     map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
+
+
+
     // Add interaction listeners to make weather requests
     google.maps.event.addListener(map, 'idle', checkIfDataRequested);
     // Sets up and populates the info window with details
@@ -94,7 +141,7 @@ var jsonToGeoJson = function (weatherItem) {
         properties: {
             city: weatherItem.name,
             weather: weatherItem.weather[0].main,
-            temperature: weatherItem.main.temp, //* 1.8 + 32,
+            temperature: weatherItem.main.temp,
             min: weatherItem.main.temp_min,
             max: weatherItem.main.temp_max,
             humidity: weatherItem.main.humidity,
@@ -111,7 +158,7 @@ var jsonToGeoJson = function (weatherItem) {
             coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
         }
 
-    };//console.log(weatherItem.main.temp);
+    };
     // Set the custom marker icon
     map.data.setStyle(function (feature) {
         return {
@@ -146,7 +193,37 @@ var resetData = function () {
 google.maps.event.addDomListener(window, 'load', initialize);
 
 
-const geolocateURL = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk";
+/*var x = document.getElementById("demo");
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else { 
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+};
+
+function showPosition(position) {
+    x.innerHTML = "Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude;
+};*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*const geolocateURL = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk";
 
 $.ajax({
     url: geolocateURL,
@@ -160,9 +237,25 @@ $.ajax({
         "considerIp": "true",
         "cellTowers": [
           // See the Cell Tower Objects section below.
+          {
+            "cellId": 42,
+            "locationAreaCode": 415,
+            "mobileCountryCode": 310,
+            "mobileNetworkCode": 410,
+            "age": 0,
+            "signalStrength": -60,
+            "timingAdvance": 15
+          }
         ],
         "wifiAccessPoints": [
           // See the WiFi Access Point Objects section below.
+          {
+            "macAddress": "00:25:9c:cf:1c:ac",
+            "signalStrength": -43,
+            "age": 0,
+            "channel": 11,
+            "signalToNoiseRatio": 0
+          }
         ]
       }
 }).then(function (response) {
@@ -170,6 +263,6 @@ $.ajax({
 console.log(response);
 
 });
-//return position;
+//return position;*/
 
 
