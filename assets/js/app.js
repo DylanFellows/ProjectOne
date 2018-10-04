@@ -6,6 +6,8 @@ var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696";
 
 var x = document.getElementById("demo");
 
+
+
 function getLocation() {
 
     if (navigator.geolocation) {
@@ -18,17 +20,27 @@ function getLocation() {
 
 getLocation();
 
-function showPosition(position) {
+let orgAddress;
 
+function showPosition(position) {
     x.innerHTML = "Latitude: " + position.coords.latitude +
         "<br>Longitude: " + position.coords.longitude;
     var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
     map.setCenter(relocate);
-
+    $.ajax({
+        url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
+        method: 'GET'
+    }).then(function (response) {
+        let currentAddress = response.results[0].formatted_address;
+        orgAddress = currentAddress
+        x.innerHTML = "Current Address: " + currentAddress;
+        // +
+        //"<br>Longitude: " + position.coords.longitude;
+        console.log(response.results[0].formatted_address);
+    });
 };
 
 function showError(error) {
-
     switch (error.code) {
         case error.PERMISSION_DENIED:
             x.innerHTML = "User denied the request for Geolocation."
@@ -42,23 +54,16 @@ function showError(error) {
         case error.UNKNOWN_ERROR:
             x.innerHTML = "An unknown error occurred."
             break;
-
     }
-
 };
 
 function initialize() {
-
     var mapOptions = {
         zoom: 6,
     };
-
-
     map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
-
-
-
+    console.log(google.maps);
     // Add interaction listeners to make weather requests
     google.maps.event.addListener(map, 'idle', checkIfDataRequested);
     // Sets up and populates the info window with details
@@ -98,16 +103,16 @@ var getCoords = function () {
     var NE = bounds.getNorthEast();
     var SW = bounds.getSouthWest();
     getWeather(NE.lat(), NE.lng(), SW.lat(), SW.lng());
-  };
-  // Make the weather request
-  var getWeather = function(northLat, eastLng, southLat, westLng) {
+};
+// Make the weather request
+var getWeather = function (northLat, eastLng, southLat, westLng) {
     gettingData = true;
     var requestString = "http://api.openweathermap.org/data/2.5/box/city?bbox="
-                        + westLng + "," + northLat + "," //left top
-                        + eastLng + "," + southLat + "," //right bottom
-                        + map.getZoom() + "&units=imperial"
-                        + "&cluster=yes&format=json"
-                        + "&APPID=" + openWeatherMapKey;
+        + westLng + "," + northLat + "," //left top
+        + eastLng + "," + southLat + "," //right bottom
+        + map.getZoom() + "&units=imperial"
+        + "&cluster=yes&format=json"
+        + "&APPID=" + openWeatherMapKey;
     request = new XMLHttpRequest();
     request.onload = proccessResults;
     request.open("get", requestString, true);
@@ -122,72 +127,107 @@ var proccessResults = function () {
     if (results.list.length > 0) {
         resetData();
         for (var i = 0; i < results.list.length; i++) {
-          geoJSON.features.push(jsonToGeoJson(results.list[i]));
+            geoJSON.features.push(jsonToGeoJson(results.list[i]));
         }
         drawIcons(geoJSON);
     }
-  };
-  var infowindow = new google.maps.InfoWindow();
-  // For each result that comes back, convert the data to geoJSON
-  var jsonToGeoJson = function (weatherItem) {
+};
+var infowindow = new google.maps.InfoWindow();
+// For each result that comes back, convert the data to geoJSON
+var jsonToGeoJson = function (weatherItem) {
     var feature = {
-      type: "Feature",
-      properties: {
-        city: weatherItem.name,
-        weather: weatherItem.weather[0].main,
-        temperature: weatherItem.main.temp,
-        min: weatherItem.main.temp_min,
-        max: weatherItem.main.temp_max,
-        humidity: weatherItem.main.humidity,
-        pressure: weatherItem.main.pressure,
-        windSpeed: weatherItem.wind.speed,
-        windDegrees: weatherItem.wind.deg,
-        windGust: weatherItem.wind.gust,
-        icon: "http://openweathermap.org/img/w/"
-              + weatherItem.weather[0].icon  + ".png",
-        coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
-      },
-      geometry: {
-        type: "Point",
-        coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
-      }
+        type: "Feature",
+        properties: {
+            city: weatherItem.name,
+            weather: weatherItem.weather[0].main,
+            temperature: weatherItem.main.temp,
+            min: weatherItem.main.temp_min,
+            max: weatherItem.main.temp_max,
+            humidity: weatherItem.main.humidity,
+            pressure: weatherItem.main.pressure,
+            windSpeed: weatherItem.wind.speed,
+            windDegrees: weatherItem.wind.deg,
+            windGust: weatherItem.wind.gust,
+            icon: "http://openweathermap.org/img/w/"
+                + weatherItem.weather[0].icon + ".png",
+            coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
+        },
+        geometry: {
+            type: "Point",
+            coordinates: [weatherItem.coord.Lon, weatherItem.coord.Lat]
+        }
     };
     // Set the custom marker icon
-    map.data.setStyle(function(feature) {
-      return {
-        icon: {
-          url: feature.getProperty('icon'),
-          anchor: new google.maps.Point(25, 25)
-        }
-      };
+    map.data.setStyle(function (feature) {
+        return {
+            icon: {
+                url: feature.getProperty('icon'),
+                anchor: new google.maps.Point(25, 25)
+            }
+        };
     });
     // returns object
     return feature;
-  };
-  // Add the markers to the map
-  var drawIcons = function (weather) {
-     map.data.addGeoJson(geoJSON);
-     // Set the flag to finished
-     gettingData = false;
-  };
-  // Clear data layer and geoJSON
-  var resetData = function () {
+};
+// Add the markers to the map
+var drawIcons = function (weather) {
+    map.data.addGeoJson(geoJSON);
+    // Set the flag to finished
+    gettingData = false;
+};
+// Clear data layer and geoJSON
+var resetData = function () {
     geoJSON = {
-      type: "FeatureCollection",
-      features: []
+        type: "FeatureCollection",
+        features: []
     };
-    map.data.forEach(function(feature) {
-      map.data.remove(feature);
+    map.data.forEach(function (feature) {
+        map.data.remove(feature);
     });
-  };
-  google.maps.event.addDomListener(window, 'load', initialize);
-
-
-
+};
+google.maps.event.addDomListener(window, 'load', initialize);
 
 $('#btnSubmit').on('click', function(event){
   event.preventDefault();
-  var cityCountry = $('#srcinpt').val();
+    var destAddress = $('#srcinpt').val();
+    console.log(destAddress);
+    $.ajax({
+
+        url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
+        method: 'GET'
+    }).then(function (response) {
+        console.log(response.results[0].geometry.location);
+        moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
+        $('#srcinpt').val('');
+    });
+  let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+  console.log(orgAddress);
+  $.ajax({
+    url: disMatrixURL,
+    method: 'GET'
+  }).then(function(response){
+    console.log(response);
+  });
+  
+});
+
+function moveToLocation(lat, lng){
+  var center = new google.maps.LatLng(lat, lng);
+  map.panTo(center);
+};
+
+/*   Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
+$.ajax({
+    
+    url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
+    method: 'GET'
+
+}).then(function (response){
+
+    console.log(response.results[0].formatted_address);
+
+});
+var cityCountry = $('#srcinpt').val();
   console.log(cityCountry);
   let zipURL = `http://api.openweathermap.org/data/2.5/forecast?zip=${cityCountry}&appid=${openWeatherMapKey}`
   let qURL= `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`
@@ -198,21 +238,4 @@ $('#btnSubmit').on('click', function(event){
     console.log(response);
     moveToLocation(response.city.coord.lat, response.city.coord.lon);
     $('#srcinpt').val('');
-  });
-  let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=Washington,DC&destinations=${cityCountry}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-  $.ajax({
-    url: disMatrixURL,
-    method: 'GET'
-  }).then(function(response){
-    console.log(response);
-  });
-});
-
-function moveToLocation(lat, lng){
-  var center = new google.maps.LatLng(lat, lng);
-  map.panTo(center);
-};
-
-
-
-
+  });*/
