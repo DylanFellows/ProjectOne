@@ -20,35 +20,27 @@ function getLocation() {
 
 getLocation();
 
-function showPosition(position) {
+let orgAddress;
 
+function showPosition(position) {
     x.innerHTML = "Latitude: " + position.coords.latitude +
         "<br>Longitude: " + position.coords.longitude;
     var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
     map.setCenter(relocate);
-
-
     $.ajax({
-
         url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
         method: 'GET'
-
     }).then(function (response) {
-
-
-        x.innerHTML = "Current Address: " + response.results[0].formatted_address;
+        let currentAddress = response.results[0].formatted_address;
+        orgAddress = currentAddress
+        x.innerHTML = "Current Address: " + currentAddress;
         // +
         //"<br>Longitude: " + position.coords.longitude;
         console.log(response.results[0].formatted_address);
-
     });
-
-
-
 };
 
 function showError(error) {
-
     switch (error.code) {
         case error.PERMISSION_DENIED:
             x.innerHTML = "User denied the request for Geolocation."
@@ -62,25 +54,16 @@ function showError(error) {
         case error.UNKNOWN_ERROR:
             x.innerHTML = "An unknown error occurred."
             break;
-
     }
-
 };
 
 function initialize() {
-
     var mapOptions = {
         zoom: 6,
-        //center: new google.maps.LatLng(50, -50)
     };
-
-
     map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
-
     console.log(google.maps);
-
-
     // Add interaction listeners to make weather requests
     google.maps.event.addListener(map, 'idle', checkIfDataRequested);
     // Sets up and populates the info window with details
@@ -204,37 +187,33 @@ var resetData = function () {
 };
 google.maps.event.addDomListener(window, 'load', initialize);
 
-
-$('#btnSubmit').on('click', function (event) {
-
-    event.preventDefault();
+$('#btnSubmit').on('click', function(event){
+  event.preventDefault();
     var destAddress = $('#srcinpt').val();
     console.log(destAddress);
-
-    //1600 Amphitheatre Parkway, Mountain View, CA --> Just an example address
-
     $.ajax({
 
         url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
         method: 'GET'
-
     }).then(function (response) {
-
         console.log(response.results[0].geometry.location);
         moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
         $('#srcinpt').val('');
-
     });
-
+  let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+  console.log(orgAddress);
+  $.ajax({
+    url: disMatrixURL,
+    method: 'GET'
+  }).then(function(response){
+    console.log(response);
+  });
+  
 });
 
-function moveToLocation(lat, lng) {
-
-
-    var center = new google.maps.LatLng(lat, lng);
-    map.panTo(center);
-
-
+function moveToLocation(lat, lng){
+  var center = new google.maps.LatLng(lat, lng);
+  map.panTo(center);
 };
 
 /*   Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
@@ -247,4 +226,16 @@ $.ajax({
 
     console.log(response.results[0].formatted_address);
 
-});*/
+});
+var cityCountry = $('#srcinpt').val();
+  console.log(cityCountry);
+  let zipURL = `http://api.openweathermap.org/data/2.5/forecast?zip=${cityCountry}&appid=${openWeatherMapKey}`
+  let qURL= `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`
+  $.ajax({
+    url: parseInt(cityCountry) ? zipURL:qURL,
+    method: 'GET'
+  }).then(function(response){
+    console.log(response);
+    moveToLocation(response.city.coord.lat, response.city.coord.lon);
+    $('#srcinpt').val('');
+  });*/
