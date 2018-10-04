@@ -51,7 +51,6 @@ function initialize() {
 
     var mapOptions = {
         zoom: 6,
-        //center: new google.maps.LatLng(50, -50)
     };
 
 
@@ -190,13 +189,22 @@ $('#btnSubmit').on('click', function(event){
   event.preventDefault();
   var cityCountry = $('#srcinpt').val();
   console.log(cityCountry);
+  let zipURL = `http://api.openweathermap.org/data/2.5/forecast?zip=${cityCountry}&appid=${openWeatherMapKey}`
+  let qURL= `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`
   $.ajax({
-    url: `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`,
+    url: parseInt(cityCountry) ? zipURL:qURL,
     method: 'GET'
   }).then(function(response){
     console.log(response);
     moveToLocation(response.city.coord.lat, response.city.coord.lon);
     $('#srcinpt').val('');
+  });
+  let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=Washington,DC&destinations=${cityCountry}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+  $.ajax({
+    url: disMatrixURL,
+    method: 'GET'
+  }).then(function(response){
+    console.log(response);
   });
 });
 
@@ -204,3 +212,7 @@ function moveToLocation(lat, lng){
   var center = new google.maps.LatLng(lat, lng);
   map.panTo(center);
 };
+
+
+
+
