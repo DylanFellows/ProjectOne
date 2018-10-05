@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 var map;
 var geoJSON;
 var request;
@@ -8,22 +6,16 @@ var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696";
 
 var x = document.getElementById("demo");
 
-
-
 function getLocation() {
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
     }
-
 };
-
 getLocation();
 
 let orgAddress;
-
 function showPosition(position) {
     x.innerHTML = "Latitude: " + position.coords.latitude +
         "<br>Longitude: " + position.coords.longitude;
@@ -189,9 +181,8 @@ var resetData = function () {
 };
 google.maps.event.addDomListener(window, 'load', initialize);
 
->>>>>>> f3305d5643b37ef4835d375cf0ebbf273e2b9601
-$('#btnSubmit').on('click', function(event){
-  event.preventDefault();
+$('#btnSubmit').on('click', function (event) {
+    event.preventDefault();
     var destAddress = $('#srcinpt').val();
     console.log(destAddress);
     $.ajax({
@@ -203,60 +194,53 @@ $('#btnSubmit').on('click', function(event){
         moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
         $('#srcinpt').val('');
     });
-  let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-  console.log(orgAddress);
-  $.ajax({
-    url: disMatrixURL,
-    method: 'GET'
-  }).then(function(response){
-    console.log(response);
-  });
-<<<<<<< HEAD
-
-  var key = "73c3d994dd080efa8f6beab2a4662696";
-var url = "https://api.openweathermap.org/data/2.5/forecast";
-var cityCountry = $('#srcinpt').val();
-
-$.ajax({
-  url: url, //API Call
-  dataType: "json",
-  type: "GET",
-  data: {
-    q: cityCountry,
-    appid: key,
-    units: "imperial",
-    cnt: "5"
-  },
-  success: function(data) {
-    console.log('Received data:', data) // For testing
-    var wf = "";
-    wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
-    $.each(data.list, function(index, val) {
-      wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
-      wf += "<b>Day " + (index+1) + "</b>: " // Day
-      wf += val.main.temp + "&degF" // Temperature
-      wf += "<span> | " + val.weather[0].description + "</span>"; // Description
-      wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
-      wf += "</div></div>" // Closing paragraph tag
+    let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+    console.log(orgAddress);
+    $.ajax({
+        url: disMatrixURL,
+        method: 'GET'
+    }).then(function (response) {
+        console.log(response);
     });
-    $("#weather-forecast").html(wf);
-    console.log('#weather-forecast')
 
-}
+    var key = "73c3d994dd080efa8f6beab2a4662696";
+    var url = "https://api.openweathermap.org/data/2.5/forecast";
+    var cityCountry = $('#srcinpt').val();
+
+    $.ajax({
+        url: url, //API Call
+        dataType: "json",
+        type: "GET",
+        data: {
+            q: cityCountry,
+            appid: key,
+            units: "imperial",
+            cnt: "5"
+        },
+        success: function (data) {
+            console.log('Received data:', data) // For testing
+            var wf = "";
+            wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
+            $.each(data.list, function (index, val) {
+                wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
+                wf += "<b>Day " + (index + 1) + "</b>: " // Day
+                wf += val.main.temp + "&degF" // Temperature
+                wf += "<span> | " + val.weather[0].description + "</span>"; // Description
+                wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
+                wf += "</div></div>" // Closing paragraph tag
+            });
+            $("#weather-forecast").html(wf);
+            console.log('#weather-forecast')
+
+        }
+
+    });
+
 });
 
-=======
-  
->>>>>>> f3305d5643b37ef4835d375cf0ebbf273e2b9601
-});
-
-function moveToLocation(lat, lng){
-  var center = new google.maps.LatLng(lat, lng);
-  map.panTo(center);
-<<<<<<< HEAD
-};  
-
-=======
+function moveToLocation(lat, lng) {
+    var center = new google.maps.LatLng(lat, lng);
+    map.panTo(center);
 };
 
 /*   Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
@@ -282,4 +266,3 @@ var cityCountry = $('#srcinpt').val();
     moveToLocation(response.city.coord.lat, response.city.coord.lon);
     $('#srcinpt').val('');
   });*/
->>>>>>> f3305d5643b37ef4835d375cf0ebbf273e2b9601
