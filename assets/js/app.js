@@ -210,6 +210,7 @@ $('#btnSubmit').on('click', function (event) {
     console.log(response);
   });
 
+
   
   function initMap() {
     var directionsService = new google.maps.DirectionsService();
@@ -243,9 +244,68 @@ $('#btnSubmit').on('click', function (event) {
 function moveToLocation(lat, lng) {
   var center = new google.maps.LatLng(lat, lng);
   map.panTo(center);
+    event.preventDefault();
+    var destAddress = $('#srcinpt').val();
+    console.log(destAddress);
+    $.ajax({
+
+        url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
+        method: 'GET'
+    }).then(function (response) {
+        console.log(response.results[0].geometry.location);
+        moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
+        $('#srcinpt').val('');
+    });
+    let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+    console.log(orgAddress);
+    $.ajax({
+        url: disMatrixURL,
+        method: 'GET'
+    }).then(function (response) {
+        console.log(response);
+    });
+
+    var key = "73c3d994dd080efa8f6beab2a4662696";
+    var url = "https://api.openweathermap.org/data/2.5/forecast";
+    var cityCountry = $('#srcinpt').val();
+
+    $.ajax({
+        url: url, //API Call
+        dataType: "json",
+        type: "GET",
+        data: {
+            q: cityCountry,
+            appid: key,
+            units: "imperial",
+            cnt: "5"
+        },
+        success: function (data) {
+            console.log('Received data:', data) // For testing
+            var wf = "";
+            wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
+            $.each(data.list, function (index, val) {
+                wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
+                wf += "<b>Day " + (index + 1) + "</b>: " // Day
+                wf += val.main.temp + "&degF" // Temperature
+                wf += "<span> | " + val.weather[0].description + "</span>"; // Description
+                wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
+                wf += "</div></div>" // Closing paragraph tag
+            });
+            $("#weather-forecast").html(wf);
+            console.log('#weather-forecast')
+
+        }
+
+    });
+
 };
 
-/*   Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
+/*function moveToLocation(lat, lng) {
+    var center = new google.maps.LatLng(lat, lng);
+    map.panTo(center);
+};
+
+   Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
 $.ajax({
     
     url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,

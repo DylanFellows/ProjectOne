@@ -30,7 +30,17 @@ html, body{
       border-color: whitesmoke;
   }
 
-  .topnav {
-      
-  }
+  .card {
+    width: 320px;
+    background-color: black;
+    color: grey;
+  } 
 
+  .ctycrd {
+    width: 200px;
+    background-color: black;
+    color: gray;
+    font-size: 30px;
+    text-align: center;
+  }
+  
