@@ -3,7 +3,9 @@ var geoJSON;
 var request;
 var gettingData = false;
 var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696";
-
+var directionsService;
+var directionsDisplay;
+var destAddress;
 var x = document.getElementById("demo");
 
 function getLocation() {
@@ -52,6 +54,8 @@ function showError(error) {
 };
 
 function initialize() {
+  directionsService = new google.maps.DirectionsService;
+  directionsDisplay = new google.maps.DirectionsRenderer;
   var mapOptions = {
     zoom: 6,
   };
@@ -60,6 +64,8 @@ function initialize() {
   console.log(google.maps);
   // Add interaction listeners to make weather requests
   google.maps.event.addListener(map, 'idle', checkIfDataRequested);
+  directionsDisplay.setMap(map);
+
   // Sets up and populates the info window with details
   map.data.addListener('click', function (event) {
     infowindow.setContent(
@@ -183,7 +189,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 $('#btnSubmit').on('click', function (event) {
   event.preventDefault();
-  var destAddress = $('#srcinpt').val();
+  destAddress = $('#srcinpt').val();
   console.log(destAddress);
   $.ajax({
 
@@ -210,96 +216,76 @@ $('#btnSubmit').on('click', function (event) {
     console.log(response);
   });
 
+  var key = "73c3d994dd080efa8f6beab2a4662696";
+  var url = "https://api.openweathermap.org/data/2.5/forecast";
+  var cityCountry = $('#srcinpt').val();
 
-  
-  function initMap() {
-    var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer();
-    var chicago = new google.maps.LatLng(41.850033, -87.6500523);
-    var mapOptions = {
-      zoom:7,
-      center: chicago
-  };
-    var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  directionsDisplay.setMap(map);
-  console.log(directionsDisplay);
-  };
+  $.ajax({
+    url: url, //API Call
+    dataType: "json",
+    type: "GET",
+    data: {
+      q: cityCountry,
+      appid: key,
+      units: "imperial",
+      cnt: "5"
+    },
+    success: function (data) {
+      console.log('Received data:', data) // For testing
+      var wf = "";
+      wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
+      $.each(data.list, function (index, val) {
+        wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
+        wf += "<b>Day " + (index + 1) + "</b>: " // Day
+        wf += val.main.temp + "&degF" // Temperature
+        wf += "<span> | " + val.weather[0].description + "</span>"; // Description
+        wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
+        wf += "</div></div>" // Closing paragraph tag
+      });
+      $("#weather-forecast").html(wf);
+      console.log('#weather-forecast')
 
-  function calcRoute() {
-  var start = document.getElementById('start').value;
-    var end = document.getElementById('end').value;
-    var request = {
-      origin: start,
-      destination: end,
-      travelMode: 'DRIVING'
-    };
-    directionsService.route(request, function(result, status) {
-      if (status == 'OK') {
-        directionsDisplay.setDirections(result);
-      };
-    });
+    }
+
+  });
+
+
+
+
+  function moveToLocation(lat, lng) {
+    var center = new google.maps.LatLng(lat, lng);
+    map.panTo(center);
   };
 });
-
-function moveToLocation(lat, lng) {
-  var center = new google.maps.LatLng(lat, lng);
-  map.panTo(center);
-    event.preventDefault();
-    var destAddress = $('#srcinpt').val();
-    console.log(destAddress);
-    $.ajax({
-
-        url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
-        method: 'GET'
-    }).then(function (response) {
-        console.log(response.results[0].geometry.location);
-        moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
-        $('#srcinpt').val('');
-    });
-    let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-    console.log(orgAddress);
-    $.ajax({
-        url: disMatrixURL,
-        method: 'GET'
-    }).then(function (response) {
-        console.log(response);
-    });
-
-    var key = "73c3d994dd080efa8f6beab2a4662696";
-    var url = "https://api.openweathermap.org/data/2.5/forecast";
-    var cityCountry = $('#srcinpt').val();
-
-    $.ajax({
-        url: url, //API Call
-        dataType: "json",
-        type: "GET",
-        data: {
-            q: cityCountry,
-            appid: key,
-            units: "imperial",
-            cnt: "5"
-        },
-        success: function (data) {
-            console.log('Received data:', data) // For testing
-            var wf = "";
-            wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
-            $.each(data.list, function (index, val) {
-                wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
-                wf += "<b>Day " + (index + 1) + "</b>: " // Day
-                wf += val.main.temp + "&degF" // Temperature
-                wf += "<span> | " + val.weather[0].description + "</span>"; // Description
-                wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
-                wf += "</div></div>" // Closing paragraph tag
-            });
-            $("#weather-forecast").html(wf);
-            console.log('#weather-forecast')
-
-        }
-
-    });
-
+function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+  directionsService.route({
+    origin: orgAddress,
+    destination: destAddress,
+    optimizeWaypoints: true,
+    travelMode: 'DRIVING'
+  }, function (response, status) {
+    if (status === 'OK') {
+      directionsDisplay.setDirections(response);
+      var route = response.routes[0];
+      var summaryPanel = document.getElementById('directions-panel');
+      summaryPanel.innerHTML = '';
+      // For each route, display summary information.
+      for (var i = 0; i < route.legs.length; i++) {
+        var routeSegment = i + 1;
+        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+          '</b><br>';
+        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+        summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+        summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+      };
+    } else {
+      window.alert('Directions request failed due to ' + status);
+    };
+  });
 };
-
+document.getElementById('btnSubmit').addEventListener('click', function () {
+  calculateAndDisplayRoute(directionsService, directionsDisplay);
+});
 /*function moveToLocation(lat, lng) {
     var center = new google.maps.LatLng(lat, lng);
     map.panTo(center);
