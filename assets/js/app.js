@@ -54,8 +54,8 @@ getLocation();
 
 let orgAddress;
 function showPosition(position) {
-  x.innerHTML = "Latitude: " + position.coords.latitude +
-    "<br>Longitude: " + position.coords.longitude;
+//   x.innerHTML = "Latitude: " + position.coords.latitude +
+//     "<br>Longitude: " + position.coords.longitude;
   var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
   map.setCenter(relocate);
   $.ajax({
@@ -64,7 +64,7 @@ function showPosition(position) {
   }).then(function (response) {
     let currentAddress = response.results[0].formatted_address;
     orgAddress = currentAddress
-    x.innerHTML = "Current Address: " + currentAddress;
+    // x.innerHTML = "Current Address: " + currentAddress;
     // +
     //"<br>Longitude: " + position.coords.longitude;
     console.log(response.results[0].formatted_address);
@@ -268,12 +268,12 @@ $('#btnSubmit').on('click', function (event) {
     success: function (data) {
       console.log('Received data:', data) // For testing
       var wf = "";
-      wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
+      wf += "<div class='ctycrd'> <div>" + data.city.name + "</div></div>"; // City (displays once)
       $.each(data.list, function (index, val) {
         wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
         wf += "<b>Day " + (index + 1) + "</b>: " // Day
         wf += val.main.temp + "&degF" // Temperature
-        wf += "<span> | " + val.weather[0].description + "</span>"; // Description
+        wf += "<span>  " + val.weather[0].description + "     " + "</span>"; // Description
         wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
         wf += "</div></div>" // Closing paragraph tag
       });

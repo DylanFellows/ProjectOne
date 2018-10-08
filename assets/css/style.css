@@ -13,7 +13,7 @@ html, body{
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: black;
+    background-color: whitesmoke;
   }
   #map-canvas {
     width: 100%;
@@ -31,21 +31,38 @@ html, body{
   }
 
   .card {
-    width: 320px;
-    background-color: black;
+    background-color: whitesmoke;
     color: grey;
+    margin: auto;
   } 
 
   .ctycrd {
-    width: 200px;
-    background-color: black;
+    width: 150px;
+    height: 100%;
+    background-color: whitesmoke;
     color: gray;
     font-size: 30px;
     text-align: center;
+    margin: 0 auto;
+    padding: 70px 0px;
   }
   
 #temp {
   font-size:  25px;
   margin-top: 5px;
   color: rgb(89, 98, 105);
+}
+
+.wfmode {
+  position: relative;
+  right: 25%;
+  background-color: whitesmoke;
+  color: gray;
+  width: 150%;
+}
+
+.card-body {
+  width: 180px;
+  height: 150px;
+  padding-top: 25%;
 }
