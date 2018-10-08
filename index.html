@@ -6,10 +6,10 @@
     <link rel="stylesheet" href="./assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="./assets/css/style.css">
     <title>Welcome</title>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk&libraries=places"></script>
 </head>
 <body class="container-fluid">
-<div class="container-fluid pos-f-t topnav">
+<div class="container-fluid pos-f-t topnav"></div>
         <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-lg">
             <div class="modal-content wfmode">
@@ -20,7 +20,7 @@
         <nav class="navbar container-fluid">
                 <button type="button" class="btn btn-outline-secondary wforecast" data-toggle="modal" data-target=".bd-example-modal-lg">Forecast</button>
             <form class="form-inline inputbr">
-                    <input id="srcinpt" class="form-control mr-sm-2" type="search" placeholder="Please input a city." autocomplete="off" aria-label="Search">
+                    <input id="srcinpt" class="form-control mr-sm-2 controls" type="search" placeholder="Please input a city." autocomplete="off" aria-label="Search">
                     <button id="btnSubmit" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
                   </form>
                   <!-- <div class="name"></div> -->
