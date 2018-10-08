@@ -50,21 +50,21 @@ getLocation();
 
 let orgAddress;
 function showPosition(position) {
-    x.innerHTML = "Latitude: " + position.coords.latitude +
-        "<br>Longitude: " + position.coords.longitude;
-    var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-    map.setCenter(relocate);
-    $.ajax({
-        url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
-        method: 'GET'
-    }).then(function (response) {
-        let currentAddress = response.results[0].formatted_address;
-        orgAddress = currentAddress
-        x.innerHTML = "Current Address: " + currentAddress;
-        // +
-        //"<br>Longitude: " + position.coords.longitude;
-        console.log(response.results[0].formatted_address);
-    });
+//   x.innerHTML = "Latitude: " + position.coords.latitude +
+//     "<br>Longitude: " + position.coords.longitude;
+  var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+  map.setCenter(relocate);
+  $.ajax({
+    url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
+    method: 'GET'
+  }).then(function (response) {
+    let currentAddress = response.results[0].formatted_address;
+    orgAddress = currentAddress
+    // x.innerHTML = "Current Address: " + currentAddress;
+    // +
+    //"<br>Longitude: " + position.coords.longitude;
+    console.log(response.results[0].formatted_address);
+  });
 };
 
 function showError(error) {
@@ -319,7 +319,7 @@ searchBox.addListener('places_changed', function () {
         success: function (data) {
             console.log('Received data:', data) // For testing
             var wf = "";
-            wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
+            wf += "<div class='ctycrd'> <div>" + data.city.name + "</div></div>"; // City (displays once)
             $.each(data.list, function (index, val) {
                 wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
                 wf += "<b>Day " + (index + 1) + "</b>: " // Day
