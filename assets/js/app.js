@@ -29,11 +29,9 @@ function getLocation() {
                 method: 'GET',
                 success: function (data) {
 
-
                     var tempr = data.main.temp;
                     var location = data.name;
                     var desc = data.weather.description;
-
 
                     $('#temp').text(tempr + '°' + "   |   " + location);
 
