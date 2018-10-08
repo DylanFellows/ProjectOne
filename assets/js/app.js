@@ -71,7 +71,7 @@ function showError(error) {
   }
 };
 
-// this re-centers the map to your current location.
+// This re-centers the map to your current location.
 function showPosition(position) {
   x.innerHTML = "Latitude: " + position.coords.latitude +
     "<br>Longitude: " + position.coords.longitude;
@@ -231,15 +231,15 @@ var input = document.getElementById('srcinpt');
 
 var searchBox = new google.maps.places.SearchBox(input);
 //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-console.log(searchBox);
 // Bias the SearchBox results towards current map's viewport.
-/*map.addListener('bounds_changed', function () {
-  searchBox.setBounds(map.getBounds());
-});*/
-
+//map.addListener('bounds_changed', function () {
+//    searchBox.setBounds(map.getBounds());
+//});
 var markers = [];
 // Listen for the event fired when the user selects a prediction and retrieve
 // more details for that place.
+
+
 searchBox.addListener('places_changed', function () {
   var places = searchBox.getPlaces();
   console.log(places);
