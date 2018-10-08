@@ -30,7 +30,6 @@ function getLocation() {
                 success: function (data) {
 
 
-
                     var tempr = data.main.temp;
                     var location = data.name;
                     var desc = data.weather.description;
@@ -45,9 +44,6 @@ function getLocation() {
     } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
     }
-
-
-
 
 };
 getLocation();
@@ -88,7 +84,7 @@ function showError(error) {
     }
 };
 
-// this re-centers the map to your current location.
+// This re-centers the map to your current location.
 function showPosition(position) {
     x.innerHTML = "Latitude: " + position.coords.latitude +
         "<br>Longitude: " + position.coords.longitude;
@@ -355,7 +351,7 @@ $('#btnSubmit').on('click', function (event) {
 
     event.preventDefault();
     destAddress = $('#srcinpt').val();
-    console.log(destAddress);
+    //console.log(destAddress);
 
     $.ajax({
         url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
