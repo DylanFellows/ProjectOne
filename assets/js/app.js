@@ -254,7 +254,6 @@ var searchBox = new google.maps.places.SearchBox(input);
 //map.addListener('bounds_changed', function () {
 //    searchBox.setBounds(map.getBounds());
 //});
-
 var markers = [];
 // Listen for the event fired when the user selects a prediction and retrieve
 // more details for that place.
@@ -264,7 +263,7 @@ searchBox.addListener('places_changed', function () {
 
     var places = searchBox.getPlaces();
 
-    console.log(places[0].address_components[2].long_name);
+    console.log(places);
 
     if (places.length == 0) {
         return;
@@ -316,7 +315,7 @@ searchBox.addListener('places_changed', function () {
         dataType: "json",
         type: "GET",
         data: {
-            q: places[0].address_components[2].long_name,
+            q: places[0].vicinity,
             appid: key,
             units: "imperial",
             cnt: "5"
@@ -386,14 +385,13 @@ $('#btnSubmit').on('click', function (event) {
     });
 
 
-
-
     function moveToLocation(lat, lng) {
         var center = new google.maps.LatLng(lat, lng);
         map.panTo(center);
     };
 
 });
+
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     directionsService.route({
         origin: orgAddress,
