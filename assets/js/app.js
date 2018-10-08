@@ -6,19 +6,52 @@ var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696";
 
 var x = document.getElementById("demo");
 
+var lat, lon, api_url;
+
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(gotLocation);
+        
+        function gotLocation(position) {
+            lat = position.coords.latitude;
+            lon = position.coords.longitude;
+            
+            api_url = 'http://api.openweathermap.org/data/2.5/weather?lat=' +
+                      lat + '&lon=' + 
+                      lon + '&units=imperial&appid=73c3d994dd080efa8f6beab2a4662696';
+           // http://api.openweathermap.org/data/2.5/weather?q=London,uk&callback=test&appid=b1b15e88fa79722
+            
+            $.ajax({
+              url : api_url,
+              method : 'GET',
+              success : function (data) {
+                
+    
+    
+                var tempr = data.main.temp;
+                var location = data.name;
+                var desc = data.weather.description;
+                
+    
+                $('#temp').text(tempr + '°' + "   |   " + location);
+    
+              }
+            });
+         }
+        
     } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
     }
+
+
+    
+
 };
 getLocation();
 
 let orgAddress;
 function showPosition(position) {
-    x.innerHTML = "Latitude: " + position.coords.latitude +
-        "<br>Longitude: " + position.coords.longitude;
     var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
     map.setCenter(relocate);
     $.ajax({
@@ -27,11 +60,26 @@ function showPosition(position) {
     }).then(function (response) {
         let currentAddress = response.results[0].formatted_address;
         orgAddress = currentAddress
-        x.innerHTML = "Current Address: " + currentAddress;
-        // +
-        //"<br>Longitude: " + position.coords.longitude;
         console.log(response.results[0].formatted_address);
     });
+
+
+    // const APIKey = '73c3d994dd080efa8f6beab2a4662696';
+
+    // // Here we are building the URL we need to query the database
+    // const queryURL = `api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}`;
+    
+    // // We then created an AJAX call
+    // $.ajax({
+    //   url: queryURL,
+    //   method: 'GET'
+    // }).then(function(response) {
+    //   console.log(response) 
+    //   $(".temp").append(`${response.main.temp}`);
+    //   $(".name").append(`${response.name}`)
+    // });
+
+
 };
 
 function showError(error) {
@@ -53,7 +101,7 @@ function showError(error) {
 
 function initialize() {
     var mapOptions = {
-        zoom: 6,
+        zoom: 10,
     };
     map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
