@@ -8,6 +8,7 @@ var directionsDisplay;
 var destAddress;
 var x = document.getElementById("demo");
 var lat, lon, api_url;
+var weatherInput;
 
 function getLocation() {
   if (navigator.geolocation) {
@@ -41,8 +42,6 @@ getLocation();
 
 let orgAddress;
 function showPosition(position) {
-  x.innerHTML = "Latitude: " + position.coords.latitude +
-    "<br>Longitude: " + position.coords.longitude;
   var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
   map.setCenter(relocate);
   $.ajax({
@@ -51,9 +50,6 @@ function showPosition(position) {
   }).then(function (response) {
     let currentAddress = response.results[0].formatted_address;
     orgAddress = currentAddress
-    x.innerHTML = "Current Address: " + currentAddress;
-    // +
-    //"<br>Longitude: " + position.coords.longitude;
     console.log(response.results[0].formatted_address);
   });
 };
@@ -245,9 +241,39 @@ var markers = [];
 // Listen for the event fired when the user selects a prediction and retrieve
 // more details for that place.
 searchBox.addListener('places_changed', function () {
-  displayWeather();
   var places = searchBox.getPlaces();
   console.log(places);
+  var key = "73c3d994dd080efa8f6beab2a4662696";
+  var url = "https://api.openweathermap.org/data/2.5/forecast";
+
+  $.ajax({
+    url: url, //API Call
+    dataType: "json",
+    type: "GET",
+    data: {
+      q: places[0].vicinity,
+      appid: key,
+      units: "imperial",
+      cnt: "5"
+    },
+    success: function (data) {
+      console.log('Received data:', data) // For testing
+      var wf = "";
+      wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
+      $.each(data.list, function (index, val) {
+        wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
+        wf += "<b>Day " + (index + 1) + "</b>: " // Day
+        wf += val.main.temp + "&degF" // Temperature
+        wf += "<span> | " + val.weather[0].description + "</span>"; // Description
+        wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
+        wf += "</div></div>" // Closing paragraph tag
+      });
+      $("#weather-forecast").html(wf);
+      console.log('#weather-forecast')
+
+    }
+  }
+    );
   if (places.length == 0) {
     return;
   }
@@ -259,7 +285,7 @@ searchBox.addListener('places_changed', function () {
   markers = [];
 
   // For each place, get the icon, name and location.
-  var bounds = new google.maps.LatLngBounds(displayWeather());
+  var bounds = new google.maps.LatLngBounds();
   places.forEach(function (place) {
     console.log("PLACE", place)
     if (!place.geometry) {
@@ -321,38 +347,6 @@ $('#btnSubmit').on('click', function (event) {
     console.log(response);
   });
 
-  var key = "73c3d994dd080efa8f6beab2a4662696";
-  var url = "https://api.openweathermap.org/data/2.5/forecast";
-  var cityCountry = $('#srcinpt').val();
-
-  $.ajax({
-    url: url, //API Call
-    dataType: "json",
-    type: "GET",
-    data: {
-      q: cityCountry,
-      appid: key,
-      units: "imperial",
-      cnt: "5"
-    },
-    success: function (data) {
-      console.log('Received data:', data) // For testing
-      var wf = "";
-      wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
-      $.each(data.list, function (index, val) {
-        wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
-        wf += "<b>Day " + (index + 1) + "</b>: " // Day
-        wf += val.main.temp + "&degF" // Temperature
-        wf += "<span> | " + val.weather[0].description + "</span>"; // Description
-        wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
-        wf += "</div></div>" // Closing paragraph tag
-      });
-      $("#weather-forecast").html(wf);
-      console.log('#weather-forecast')
-
-    }
-  }
-    );
 function moveToLocation(lat, lng) {
   var center = new google.maps.LatLng(lat, lng);
   map.panTo(center);
@@ -405,16 +399,3 @@ function moveToLocation(lat, lng) {
     console.log(response.results[0].formatted_address);
 
 });*/
-
-var cityCountry = $('#srcinpt').val();
-console.log(cityCountry);
-let zipURL = `http://api.openweathermap.org/data/2.5/forecast?zip=${cityCountry}&appid=${openWeatherMapKey}`
-let qURL = `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`
-$.ajax({
-  url: parseInt(cityCountry) ? zipURL : qURL,
-  method: 'GET'
-}).then(function (response) {
-  console.log(response);
-  moveToLocation(response.city.coord.lat, response.city.coord.lon);
-  $('#srcinpt').val('');
-});
