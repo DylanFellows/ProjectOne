@@ -11,7 +11,7 @@
 
     <title>Welcome</title>
 
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk&libraries=places"></script>
 
 </head>
 
@@ -22,10 +22,10 @@
 
 
 
-<div class="container-fluid pos-f-t topnav">
+    <div class="container-fluid pos-f-t topnav">
         <div class="collapse" id="navbarToggleExternalContent">
             <div class=" p-4">
-                <div id="weather-forecast" class="row text-center container-fluid"> 
+                <div id="weather-forecast" class="row text-center container-fluid">
 
                 </div>
             </div>
@@ -36,14 +36,23 @@
             </button>
 
             <form class="form-inline inputbr">
-                    <input id="srcinpt" class="form-control mr-sm-2" type="search" placeholder="Please input a city." autocomplete="off" aria-label="Search">
+                <input id="srcinpt" class="controls" type="text" placeholder="Search Box">
+                <button id="btnSubmit" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
+            </form>
+                    <!--<input id="srcinpt" class="form-control mr-sm-2" type="search" placeholder="Please input a city." autocomplete="off" aria-label="Search">
                     <button id="btnSubmit" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
-                  </form>
+                  </form>-->
+
+                  <!-- <div class="name"></div> -->
+                  <div id="temp"></div>
+                  <div class="time"></div>
+
         </nav>
-</div>
+    </div>
 
-<div></div>
 
+
+    
 
     <div id="map-canvas"></div>
 
@@ -55,6 +64,8 @@
         copyright
     </footer>
 </div>
+
+    <div id="directions-panel"></div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
