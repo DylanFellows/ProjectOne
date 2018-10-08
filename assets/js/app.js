@@ -9,12 +9,47 @@ var destAddress;
 
 var x = document.getElementById("demo");
 
+var lat, lon, api_url;
+
 function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    x.innerHTML = "Geolocation is not supported by this browser.";
-  }
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(gotLocation);
+        
+        function gotLocation(position) {
+            lat = position.coords.latitude;
+            lon = position.coords.longitude;
+            
+            api_url = 'http://api.openweathermap.org/data/2.5/weather?lat=' +
+                      lat + '&lon=' + 
+                      lon + '&units=imperial&appid=73c3d994dd080efa8f6beab2a4662696';
+           // http://api.openweathermap.org/data/2.5/weather?q=London,uk&callback=test&appid=b1b15e88fa79722
+            
+            $.ajax({
+              url : api_url,
+              method : 'GET',
+              success : function (data) {
+                
+    
+    
+                var tempr = data.main.temp;
+                var location = data.name;
+                var desc = data.weather.description;
+                
+    
+                $('#temp').text(tempr + '°' + "   |   " + location);
+    
+              }
+            });
+         }
+        
+    } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+
+
+    
+
 };
 getLocation();
 
