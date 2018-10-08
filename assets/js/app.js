@@ -249,19 +249,23 @@ var input = document.getElementById('srcinpt');
 
 var searchBox = new google.maps.places.SearchBox(input);
 //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-console.log(searchBox);
 // Bias the SearchBox results towards current map's viewport.
-map.addListener('bounds_changed', function () {
-    searchBox.setBounds(map.getBounds());
-});
+
+//map.addListener('bounds_changed', function () {
+//    searchBox.setBounds(map.getBounds());
+//});
 
 var markers = [];
 // Listen for the event fired when the user selects a prediction and retrieve
 // more details for that place.
+
+
 searchBox.addListener('places_changed', function () {
-    displayWeather();
+
     var places = searchBox.getPlaces();
-    console.log(places);
+
+    console.log(places[0].address_components[2].long_name);
+
     if (places.length == 0) {
         return;
     }
@@ -273,7 +277,7 @@ searchBox.addListener('places_changed', function () {
     markers = [];
 
     // For each place, get the icon, name and location.
-    var bounds = new google.maps.LatLngBounds(displayWeather());
+    var bounds = new google.maps.LatLngBounds();
     places.forEach(function (place) {
         if (!place.geometry) {
             console.log("Returned place contains no geometry");
@@ -303,57 +307,16 @@ searchBox.addListener('places_changed', function () {
         }
     });
     map.fitBounds(bounds);
-});
-
-let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-console.log(orgAddress);
-$.ajax({
-    url: disMatrixURL,
-    method: 'GET'
-}).then(function (response) {
-    console.log(response);
-});
-
-
-$('#btnSubmit').on('click', function (event) {
-    event.preventDefault();
-    destAddress = $('#srcinpt').val();
-    console.log(destAddress);
-    $.ajax({
-
-        url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
-        method: 'GET'
-    }).then(function (response) {
-        console.log(response.results[0].geometry.location);
-        moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
-        $('#srcinpt').val('');
-    });
-    let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-    console.log(orgAddress);
-    $.ajax({
-        url: disMatrixURL,
-        method: 'GET'
-    }).then(function (response) {
-        console.log(response);
-    });
-    let directURL = `https://maps.googleapis.com/maps/api/directions/json?origin=${orgAddress}&destination=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-    $.ajax({
-        url: directURL,
-        method: 'GET'
-    }).then(function (response) {
-        console.log(response);
-    });
 
     var key = "73c3d994dd080efa8f6beab2a4662696";
     var url = "https://api.openweathermap.org/data/2.5/forecast";
-    var cityCountry = $('#srcinpt').val();
 
     $.ajax({
         url: url, //API Call
         dataType: "json",
         type: "GET",
         data: {
-            q: cityCountry,
+            q: places[0].address_components[2].long_name,
             appid: key,
             units: "imperial",
             cnt: "5"
@@ -371,10 +334,55 @@ $('#btnSubmit').on('click', function (event) {
                 wf += "</div></div>" // Closing paragraph tag
             });
             $("#weather-forecast").html(wf);
-            console.log('#weather-forecast')
+            console.log('#weather-forecast');
 
         }
 
+    });
+
+});
+
+let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+console.log(orgAddress);
+$.ajax({
+    url: disMatrixURL,
+    method: 'GET'
+}).then(function (response) {
+    console.log(response);
+});
+
+
+$('#btnSubmit').on('click', function (event) {
+
+    event.preventDefault();
+    destAddress = $('#srcinpt').val();
+    console.log(destAddress);
+
+    $.ajax({
+        url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
+        method: 'GET'
+    }).then(function (response) {
+        console.log(response.results[0].geometry.location);
+        moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
+        $('#srcinpt').val('');
+    });
+
+    let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+    console.log(orgAddress);
+
+    $.ajax({
+        url: disMatrixURL,
+        method: 'GET'
+    }).then(function (response) {
+        console.log(response);
+    });
+
+    let directURL = `https://maps.googleapis.com/maps/api/directions/json?origin=${orgAddress}&destination=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
+    $.ajax({
+        url: directURL,
+        method: 'GET'
+    }).then(function (response) {
+        console.log(response);
     });
 
 
@@ -384,6 +392,7 @@ $('#btnSubmit').on('click', function (event) {
         var center = new google.maps.LatLng(lat, lng);
         map.panTo(center);
     };
+
 });
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     directionsService.route({
@@ -415,10 +424,10 @@ document.getElementById('btnSubmit').addEventListener('click', function () {
     calculateAndDisplayRoute(directionsService, directionsDisplay);
 });
 
-function moveToLocation(lat, lng) {
+/*function moveToLocation(lat, lng) {
     var center = new google.maps.LatLng(lat, lng);
     map.panTo(center);
-};
+};*/
 
 //Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
 /*$.ajax({
