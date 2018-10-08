@@ -6,50 +6,36 @@ var openWeatherMapKey = "73c3d994dd080efa8f6beab2a4662696";
 var directionsService;
 var directionsDisplay;
 var destAddress;
-
 var x = document.getElementById("demo");
-
 var lat, lon, api_url;
 
 function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-        navigator.geolocation.getCurrentPosition(gotLocation);
-        
-        function gotLocation(position) {
-            lat = position.coords.latitude;
-            lon = position.coords.longitude;
-            
-            api_url = 'http://api.openweathermap.org/data/2.5/weather?lat=' +
-                      lat + '&lon=' + 
-                      lon + '&units=imperial&appid=73c3d994dd080efa8f6beab2a4662696';
-           // http://api.openweathermap.org/data/2.5/weather?q=London,uk&callback=test&appid=b1b15e88fa79722
-            
-            $.ajax({
-              url : api_url,
-              method : 'GET',
-              success : function (data) {
-                
-    
-    
-                var tempr = data.main.temp;
-                var location = data.name;
-                var desc = data.weather.description;
-                
-    
-                $('#temp').text(tempr + '°' + "   |   " + location);
-    
-              }
-            });
-         }
-        
-    } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+    navigator.geolocation.getCurrentPosition(gotLocation);
+
+    function gotLocation(position) {
+      lat = position.coords.latitude;
+      lon = position.coords.longitude;
+
+      api_url = 'http://api.openweathermap.org/data/2.5/weather?lat=' +
+        lat + '&lon=' +
+        lon + '&units=imperial&appid=73c3d994dd080efa8f6beab2a4662696';
+      // http://api.openweathermap.org/data/2.5/weather?q=London,uk&callback=test&appid=b1b15e88fa79722
+      $.ajax({
+        url: api_url,
+        method: 'GET',
+        success: function (data) {
+          var tempr = data.main.temp;
+          var location = data.name;
+          var desc = data.weather.description;
+          $('#temp').text(tempr + '°' + "   |   " + location);
+        }
+      });
     }
-
-
-    
-
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
 };
 getLocation();
 
@@ -89,6 +75,25 @@ function showError(error) {
   }
 };
 
+// this re-centers the map to your current location.
+function showPosition(position) {
+  x.innerHTML = "Latitude: " + position.coords.latitude +
+    "<br>Longitude: " + position.coords.longitude;
+  var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+  //console.log(google.maps);
+  map.setCenter(relocate);
+
+  $.ajax({
+    url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
+    method: 'GET'
+  }).then(function (response) {
+    let currentAddress = response.results[0].formatted_address;
+    orgAddress = currentAddress
+    x.innerHTML = "Current Address: " + currentAddress;
+    console.log(response.results[0].formatted_address);
+  });
+};
+
 function initialize() {
   directionsService = new google.maps.DirectionsService;
   directionsDisplay = new google.maps.DirectionsRenderer;
@@ -104,6 +109,7 @@ function initialize() {
 
   // Sets up and populates the info window with details
   map.data.addListener('click', function (event) {
+    console.log("EVENT", event.feature);
     infowindow.setContent(
       "<img src=" + event.feature.getProperty("icon") + ">"
       + "<br /><strong>" + event.feature.getProperty("city") + "</strong>"
@@ -224,12 +230,74 @@ var resetData = function () {
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
+// Create the search box and link it to the UI element.
+var input = document.getElementById('srcinpt');
+
+var searchBox = new google.maps.places.SearchBox(input);
+//map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+console.log(searchBox);
+// Bias the SearchBox results towards current map's viewport.
+/*map.addListener('bounds_changed', function () {
+  searchBox.setBounds(map.getBounds());
+});*/
+
+var markers = [];
+// Listen for the event fired when the user selects a prediction and retrieve
+// more details for that place.
+searchBox.addListener('places_changed', function () {
+  displayWeather();
+  var places = searchBox.getPlaces();
+  console.log(places);
+  if (places.length == 0) {
+    return;
+  }
+
+  // Clear out the old markers.
+  markers.forEach(function (marker) {
+    marker.setMap(null);
+  });
+  markers = [];
+
+  // For each place, get the icon, name and location.
+  var bounds = new google.maps.LatLngBounds(displayWeather());
+  places.forEach(function (place) {
+    console.log("PLACE", place)
+    if (!place.geometry) {
+      console.log("Returned place contains no geometry");
+      return;
+    }
+    var icon = {
+      url: place.icon,
+      size: new google.maps.Size(71, 71),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(17, 34),
+      scaledSize: new google.maps.Size(25, 25)
+    };
+
+    // Create a marker for each place.
+
+    markers.push(new google.maps.Marker({
+      map: map,
+      icon: icon,
+      title: place.name,
+      position: place.geometry.location
+    }));
+
+    if (place.geometry.viewport) {
+      // Only geocodes have viewport.
+      bounds.union(place.geometry.viewport);
+    } else {
+      bounds.extend(place.geometry.location);
+    }
+  });
+  map.fitBounds(bounds);
+});
+
 $('#btnSubmit').on('click', function (event) {
   event.preventDefault();
   destAddress = $('#srcinpt').val();
   console.log(destAddress);
   $.ajax({
-
     url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
     method: 'GET'
   }).then(function (response) {
@@ -283,14 +351,14 @@ $('#btnSubmit').on('click', function (event) {
       console.log('#weather-forecast')
 
     }
-
-  });
-
-  function moveToLocation(lat, lng) {
-    var center = new google.maps.LatLng(lat, lng);
-    map.panTo(center);
-  };
+  }
+    );
+function moveToLocation(lat, lng) {
+  var center = new google.maps.LatLng(lat, lng);
+  map.panTo(center);
+};
 });
+
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   directionsService.route({
     origin: orgAddress,
@@ -320,31 +388,33 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 document.getElementById('btnSubmit').addEventListener('click', function () {
   calculateAndDisplayRoute(directionsService, directionsDisplay);
 });
-/*function moveToLocation(lat, lng) {
-    var center = new google.maps.LatLng(lat, lng);
-    map.panTo(center);
+
+function moveToLocation(lat, lng) {
+  var center = new google.maps.LatLng(lat, lng);
+  map.panTo(center);
 };
 
-   Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
-$.ajax({
-    
+//Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
+/*$.ajax({
+
     url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
     method: 'GET'
 
-}).then(function (response){
+}).then(function (response) {
 
     console.log(response.results[0].formatted_address);
 
-});
+});*/
+
 var cityCountry = $('#srcinpt').val();
-  console.log(cityCountry);
-  let zipURL = `http://api.openweathermap.org/data/2.5/forecast?zip=${cityCountry}&appid=${openWeatherMapKey}`
-  let qURL= `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`
-  $.ajax({
-    url: parseInt(cityCountry) ? zipURL:qURL,
-    method: 'GET'
-  }).then(function(response){
-    console.log(response);
-    moveToLocation(response.city.coord.lat, response.city.coord.lon);
-    $('#srcinpt').val('');
-  });*/
+console.log(cityCountry);
+let zipURL = `http://api.openweathermap.org/data/2.5/forecast?zip=${cityCountry}&appid=${openWeatherMapKey}`
+let qURL = `http://api.openweathermap.org/data/2.5/forecast?q=${cityCountry}&appid=${openWeatherMapKey}`
+$.ajax({
+  url: parseInt(cityCountry) ? zipURL : qURL,
+  method: 'GET'
+}).then(function (response) {
+  console.log(response);
+  moveToLocation(response.city.coord.lat, response.city.coord.lon);
+  $('#srcinpt').val('');
+});
