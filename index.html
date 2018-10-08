@@ -15,20 +15,19 @@
 
 </head>
 
-
-
 <body class="container-fluid">
 
 
 
 
 
-    <div class="container-fluid pos-f-t topnav">
+
+<div class="container-fluid pos-f-t topnav">
         <div class="collapse" id="navbarToggleExternalContent">
             <div class=" p-4">
-                <button type="button" class="btn btn-outline-secondary">Secondary</button>
-                <button type="button" class="btn btn-outline-secondary">Secondary</button>
-                <button type="button" class="btn btn-outline-secondary">Secondary</button>
+                <div id="weather-forecast" class="row text-center container-fluid"> 
+
+                </div>
             </div>
         </div>
         <nav class="navbar">
@@ -41,16 +40,21 @@
                     <button id="btnSubmit" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
                   </form>
         </nav>
-    </div>
+</div>
 
-
+<div></div>
 
 
     <div id="map-canvas"></div>
 
-    <p id="demo"></p>
+    <p class = "text-center"id="demo"></p>
 
     <div id="weather-canvas"></div>
+   <div class="class">
+    <footer class="container-fluid">
+        copyright
+    </footer>
+</div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
@@ -58,5 +62,6 @@
     <script src="./assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="./assets/js/app.js"></script>
 </body>
+
 
 </html>

@@ -13,7 +13,7 @@ html, body{
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: black;
+    background-color:powderblue;
   }
   #map-canvas {
     width: 100%;
@@ -27,5 +27,30 @@ html, body{
       margin-top: 0%;
       border-style: groove;
       border-width: 10px;
-      border-color: whitesmoke;
+      border-color:pink;
   }
+
+  .card {
+    width: 320px;
+    background-color:whitesmoke;
+    color: black;
+  } 
+
+  .ctycrd {
+    width: 200px;
+    background-color:whitesmoke;
+    color:black;
+    font-size: 30px;
+    text-align: center;
+  }
+  
+  footer {
+    position: relative;
+    top: 0%;
+    height:0%;
+    width: 100%;
+    line-height: 0%;
+    text-align: center;
+    margin-top: 0%;
+  
+}
