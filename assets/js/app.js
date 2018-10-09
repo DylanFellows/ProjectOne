@@ -222,7 +222,7 @@ searchBox.addListener('places_changed', function () {
     method: "GET"
     }).then(function (data) {
       var wf = "";
-      wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
+      wf += "<div class='ctycrd'> <div>" + data.city.name + "</div></div>"; // City (displays once)
       $.each(data.list, function (index, val) {
         wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
         wf += "<b>Day " + (index + 1) + "</b>: " // Day
