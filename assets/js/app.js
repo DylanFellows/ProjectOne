@@ -215,7 +215,7 @@ var markers = [];
 searchBox.addListener('places_changed', function () {
   var places = searchBox.getPlaces();
   var key = "be7ef32dc30e56ada030eb5e3a5311e2";
-  var url = `https://api.openweathermap.org/data/2.5/forecast?units=imperial&cnt=5&lat=${places[0].geometry.location.lat()}&lon=${places[0].geometry.location.lng()}&units=imperial&cnt=5&appid=${key}`;
+  var url = `https://api.openweathermap.org/data/2.5/forecast?lat=${places[0].geometry.location.lat()}&lon=${places[0].geometry.location.lng()}&units=imperial&cnt=5&appid=${key}`;
 
   $.ajax({
     url: url,
