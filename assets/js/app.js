@@ -9,6 +9,8 @@ var destAddress;
 var x = document.getElementById("demo");
 var lat, lon, api_url;
 var weatherInput;
+var coorLat;
+var coorLon;
 
 function getLocation() {
   if (navigator.geolocation) {
@@ -22,7 +24,6 @@ function getLocation() {
       api_url = 'http://api.openweathermap.org/data/2.5/weather?lat=' +
         lat + '&lon=' +
         lon + '&units=imperial&appid=73c3d994dd080efa8f6beab2a4662696';
-      // http://api.openweathermap.org/data/2.5/weather?q=London,uk&callback=test&appid=b1b15e88fa79722
       $.ajax({
         url: api_url,
         method: 'GET',
@@ -41,6 +42,8 @@ function getLocation() {
 getLocation();
 
 let orgAddress;
+
+// This re-centers the map to your current location.
 function showPosition(position) {
   var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
   map.setCenter(relocate);
@@ -50,7 +53,6 @@ function showPosition(position) {
   }).then(function (response) {
     let currentAddress = response.results[0].formatted_address;
     orgAddress = currentAddress
-    console.log(response.results[0].formatted_address);
   });
 };
 
@@ -71,25 +73,6 @@ function showError(error) {
   }
 };
 
-// This re-centers the map to your current location.
-function showPosition(position) {
-  x.innerHTML = "Latitude: " + position.coords.latitude +
-    "<br>Longitude: " + position.coords.longitude;
-  var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-  //console.log(google.maps);
-  map.setCenter(relocate);
-
-  $.ajax({
-    url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
-    method: 'GET'
-  }).then(function (response) {
-    let currentAddress = response.results[0].formatted_address;
-    orgAddress = currentAddress
-    x.innerHTML = "Current Address: " + currentAddress;
-    console.log(response.results[0].formatted_address);
-  });
-};
-
 function initialize() {
   directionsService = new google.maps.DirectionsService;
   directionsDisplay = new google.maps.DirectionsRenderer;
@@ -98,14 +81,12 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
-  console.log(google.maps);
   // Add interaction listeners to make weather requests
   google.maps.event.addListener(map, 'idle', checkIfDataRequested);
   directionsDisplay.setMap(map);
 
   // Sets up and populates the info window with details
   map.data.addListener('click', function (event) {
-    console.log("EVENT", event.feature);
     infowindow.setContent(
       "<img src=" + event.feature.getProperty("icon") + ">"
       + "<br /><strong>" + event.feature.getProperty("city") + "</strong>"
@@ -155,12 +136,10 @@ var getWeather = function (northLat, eastLng, southLat, westLng) {
   request.onload = proccessResults;
   request.open("get", requestString, true);
   request.send();
-  console.log(requestString);
 };
 
 // Take the JSON results and proccess them
 var proccessResults = function () {
-  console.log(this);
   var results = JSON.parse(this.responseText);
   if (results.list.length > 0) {
     resetData();
@@ -228,36 +207,20 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 // Create the search box and link it to the UI element.
 var input = document.getElementById('srcinpt');
-
 var searchBox = new google.maps.places.SearchBox(input);
-//map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-// Bias the SearchBox results towards current map's viewport.
-//map.addListener('bounds_changed', function () {
-//    searchBox.setBounds(map.getBounds());
-//});
 var markers = [];
+
 // Listen for the event fired when the user selects a prediction and retrieve
 // more details for that place.
-
-
 searchBox.addListener('places_changed', function () {
   var places = searchBox.getPlaces();
-  console.log(places);
-  var key = "73c3d994dd080efa8f6beab2a4662696";
-  var url = "https://api.openweathermap.org/data/2.5/forecast";
+  var key = "be7ef32dc30e56ada030eb5e3a5311e2";
+  var url = `https://api.openweathermap.org/data/2.5/forecast?units=imperial&cnt=5&lat=${places[0].geometry.location.lat()}&lon=${places[0].geometry.location.lng()}&units=imperial&cnt=5&appid=${key}`;
 
   $.ajax({
-    url: url, //API Call
-    dataType: "json",
-    type: "GET",
-    data: {
-      q: places[0].vicinity,
-      appid: key,
-      units: "imperial",
-      cnt: "5"
-    },
-    success: function (data) {
-      console.log('Received data:', data) // For testing
+    url: url,
+    method: "GET"
+    }).then(function (data) {
       var wf = "";
       wf += "<div class='card ctycrd'> <div class='card-body'>" + data.city.name + "</div></div>"; // City (displays once)
       $.each(data.list, function (index, val) {
@@ -269,11 +232,7 @@ searchBox.addListener('places_changed', function () {
         wf += "</div></div>" // Closing paragraph tag
       });
       $("#weather-forecast").html(wf);
-      console.log('#weather-forecast')
-
-    }
-  }
-    );
+    });
   if (places.length == 0) {
     return;
   }
@@ -287,7 +246,6 @@ searchBox.addListener('places_changed', function () {
   // For each place, get the icon, name and location.
   var bounds = new google.maps.LatLngBounds();
   places.forEach(function (place) {
-    console.log("PLACE", place)
     if (!place.geometry) {
       console.log("Returned place contains no geometry");
       return;
@@ -322,29 +280,12 @@ searchBox.addListener('places_changed', function () {
 $('#btnSubmit').on('click', function (event) {
   event.preventDefault();
   destAddress = $('#srcinpt').val();
-  console.log(destAddress);
   $.ajax({
     url: `https://maps.googleapis.com/maps/api/geocode/json?address=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
     method: 'GET'
   }).then(function (response) {
-    console.log(response.results[0].geometry.location);
     moveToLocation(response.results[0].geometry.location.lat, response.results[0].geometry.location.lng);
     $('#srcinpt').val('');
-  });
-  let disMatrixURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${orgAddress}&destinations=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-  console.log(orgAddress);
-  $.ajax({
-    url: disMatrixURL,
-    method: 'GET'
-  }).then(function (response) {
-    console.log(response);
-  });
-  let directURL = `https://maps.googleapis.com/maps/api/directions/json?origin=${orgAddress}&destination=${destAddress}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`
-  $.ajax({
-    url: directURL,
-    method: 'GET'
-  }).then(function (response) {
-    console.log(response);
   });
 
 function moveToLocation(lat, lng) {
@@ -387,15 +328,3 @@ function moveToLocation(lat, lng) {
   var center = new google.maps.LatLng(lat, lng);
   map.panTo(center);
 };
-
-//Leave this in for now, just in case we need to do an ajax call to reverse GeoCode
-/*$.ajax({
-
-    url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyD2tX38tR0PVZxcCq_jSiPvpTcG-JrV1qk`,
-    method: 'GET'
-
-}).then(function (response) {
-
-    console.log(response.results[0].formatted_address);
-
-});*/
