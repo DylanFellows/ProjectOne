@@ -53,10 +53,6 @@ function showPosition(position) {
   }).then(function (response) {
     let currentAddress = response.results[0].formatted_address;
     orgAddress = currentAddress
-    // x.innerHTML = "Current Address: " + currentAddress;
-    // +
-    //"<br>Longitude: " + position.coords.longitude;
-    console.log(response.results[0].formatted_address);
   });
 };
 
