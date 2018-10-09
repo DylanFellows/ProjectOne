@@ -45,11 +45,6 @@ let orgAddress;
 
 // This re-centers the map to your current location.
 function showPosition(position) {
-<<<<<<< HEAD
-//   x.innerHTML = "Latitude: " + position.coords.latitude +
-//     "<br>Longitude: " + position.coords.longitude;
-=======
->>>>>>> master
   var relocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
   map.setCenter(relocate);
   $.ajax({
@@ -58,16 +53,10 @@ function showPosition(position) {
   }).then(function (response) {
     let currentAddress = response.results[0].formatted_address;
     orgAddress = currentAddress
-<<<<<<< HEAD
-<<<<<<< HEAD
     // x.innerHTML = "Current Address: " + currentAddress;
     // +
     //"<br>Longitude: " + position.coords.longitude;
-=======
->>>>>>> master
     console.log(response.results[0].formatted_address);
-=======
->>>>>>> master
   });
 };
 
