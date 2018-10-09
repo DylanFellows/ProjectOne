@@ -243,19 +243,20 @@ var markers = [];
 // Listen for the event fired when the user selects a prediction and retrieve
 // more details for that place.
 
-
 searchBox.addListener('places_changed', function () {
     var places = searchBox.getPlaces();
     console.log(places);
+    let coorLat = places[0].geometry.location.lat();
+    let coorLon = places[0].geometry.location.lng();
     var key = "73c3d994dd080efa8f6beab2a4662696";
-    var url = "https://api.openweathermap.org/data/2.5/forecast";
+    var url = `https://api.openweathermap.org/data/2.5/forecast?lat=${coorLat}&lon=${coorLon}`;
 
     $.ajax({
         url: url, //API Call
-        dataType: "json",
+        //dataType: "json",
         type: "GET",
         data: {
-            q: places[0].vicinity,
+            //q: `lat=${coorLat}&${coorLon}`,
             appid: key,
             units: "imperial",
             cnt: "5"
@@ -303,9 +304,7 @@ searchBox.addListener('places_changed', function () {
             anchor: new google.maps.Point(17, 34),
             scaledSize: new google.maps.Size(25, 25)
         };
-
         // Create a marker for each place.
-
         markers.push(new google.maps.Marker({
             map: map,
             icon: icon,
@@ -350,7 +349,6 @@ $('#btnSubmit').on('click', function (event) {
     }).then(function (response) {
         console.log(response);
     });
-
     function moveToLocation(lat, lng) {
         var center = new google.maps.LatLng(lat, lng);
         map.panTo(center);
@@ -383,6 +381,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         };
     });
 };
+
 document.getElementById('btnSubmit').addEventListener('click', function () {
     calculateAndDisplayRoute(directionsService, directionsDisplay);
 });
@@ -390,4 +389,4 @@ document.getElementById('btnSubmit').addEventListener('click', function () {
 function moveToLocation(lat, lng) {
     var center = new google.maps.LatLng(lat, lng);
     map.panTo(center);
-}
+};
