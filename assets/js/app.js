@@ -227,7 +227,7 @@ searchBox.addListener('places_changed', function () {
         wf += "<div class='card col-2'><div class='card-body'>" // Opening paragraph tag
         wf += "<b>Day " + (index + 1) + "</b>: " // Day
         wf += val.main.temp + "&degF" // Temperature
-        wf += "<span> | " + val.weather[0].description + "</span>"; // Description
+        wf += "<span>  " + val.weather[0].description + "     " + "</span>"; // Description
         wf += "<img src='https://openweathermap.org/img/w/" + val.weather[0].icon + ".png'>" // Icon
         wf += "</div></div>" // Closing paragraph tag
       });
